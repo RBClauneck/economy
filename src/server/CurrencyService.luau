@@ -14,10 +14,10 @@
 -- exposed to trusted server callers only.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Shared = ReplicatedStorage.Shared
+local EconomyShared = ReplicatedStorage.EconomyShared
 
-local Types = require(Shared.Types)
-local CurrencyConfig = require(Shared.CurrencyConfig)
+local Types = require(EconomyShared.Types)
+local CurrencyConfig = require(EconomyShared.CurrencyConfig)
 local Validation = require(script.Parent.Validation)
 local ProfileStore = require(script.Parent.ProfileStore)
 local Replication = require(script.Parent.Replication)

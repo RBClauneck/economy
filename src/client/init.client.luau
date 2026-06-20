@@ -6,9 +6,9 @@
 -- issues no economy mutations. No third-party packages are required.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Shared = ReplicatedStorage:WaitForChild("Shared")
+local EconomyShared = ReplicatedStorage:WaitForChild("EconomyShared")
 
-local Constants = require(Shared.Constants)
+local Constants = require(EconomyShared.Constants)
 local WalletController = require(script.WalletController)
 local WalletGui = require(script.WalletGui)
 
@@ -16,7 +16,7 @@ local WalletGui = require(script.WalletGui)
 -- defaults until the first snapshot arrives, then refreshes from synced values.
 WalletGui.mount()
 
-local walletSync = Shared:WaitForChild(Constants.WALLET_SYNC_EVENT) :: RemoteEvent
+local walletSync = EconomyShared:WaitForChild(Constants.WALLET_SYNC_EVENT) :: RemoteEvent
 
 -- Server is the only legitimate sender. We still validate the payload shape so
 -- a malformed message can never error the UI, and we never write back: the

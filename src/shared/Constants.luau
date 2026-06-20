@@ -11,7 +11,7 @@ local Constants = {
 	-- Prefix for per-player DataStore keys: PROFILE_KEY_PREFIX .. userId.
 	PROFILE_KEY_PREFIX = "Player_",
 
-	-- Name of the RemoteEvent the server creates in ReplicatedStorage.Shared
+	-- Name of the RemoteEvent the server creates in ReplicatedStorage.EconomyShared
 	-- to push wallet state to clients. The client waits for this same name.
 	WALLET_SYNC_EVENT = "WalletSyncEvent",
 

@@ -11,7 +11,7 @@
 -- at the first failure, which keeps later numeric tests from ever seeing a
 -- non-number.
 
-local Constants = require(game:GetService("ReplicatedStorage").Shared.Constants)
+local Constants = require(game:GetService("ReplicatedStorage").EconomyShared.Constants)
 
 local Validation = {}
 

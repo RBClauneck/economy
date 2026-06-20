@@ -2,7 +2,7 @@
 -- Replication owns the Server -> Client wallet sync over a standard Roblox
 -- RemoteEvent. It replaces the former third-party ReplicaService dependency.
 --
--- The server creates a single WalletSyncEvent inside ReplicatedStorage.Shared
+-- The server creates a single WalletSyncEvent inside ReplicatedStorage.EconomyShared
 -- (so it replicates to every client by name) and is the ONLY side that ever
 -- calls FireClient. The client never sends balance data; the one inbound
 -- message it may send is a no-argument "resend my snapshot" request, which is
@@ -10,10 +10,10 @@
 -- the server the sole dictator of balances.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Shared = ReplicatedStorage.Shared
+local EconomyShared = ReplicatedStorage.EconomyShared
 
-local Types = require(Shared.Types)
-local Constants = require(Shared.Constants)
+local Types = require(EconomyShared.Types)
+local Constants = require(EconomyShared.Constants)
 
 type Wallet = Types.Wallet
 type CurrencyId = Types.CurrencyId
@@ -22,14 +22,14 @@ type WalletSyncPayload = Types.WalletSyncPayload
 local Replication = {}
 
 -- Create the RemoteEvent up front so it exists before any client requests it.
-local existing = Shared:FindFirstChild(Constants.WALLET_SYNC_EVENT)
+local existing = EconomyShared:FindFirstChild(Constants.WALLET_SYNC_EVENT)
 local walletSync: RemoteEvent
 if existing and existing:IsA("RemoteEvent") then
 	walletSync = existing
 else
 	walletSync = Instance.new("RemoteEvent")
 	walletSync.Name = Constants.WALLET_SYNC_EVENT
-	walletSync.Parent = Shared
+	walletSync.Parent = EconomyShared
 end
 
 -- Pushes the player's entire wallet (used on join / on request).

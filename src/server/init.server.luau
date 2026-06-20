@@ -12,10 +12,10 @@
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Shared = ReplicatedStorage.Shared
+local EconomyShared = ReplicatedStorage.EconomyShared
 
-local CurrencyConfig = require(Shared.CurrencyConfig)
-local Constants = require(Shared.Constants)
+local CurrencyConfig = require(EconomyShared.CurrencyConfig)
+local Constants = require(EconomyShared.Constants)
 local CurrencyService = require(script.CurrencyService)
 local ProfileStore = require(script.ProfileStore)
 local Replication = require(script.Replication)

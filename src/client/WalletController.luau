@@ -9,10 +9,10 @@
 -- (init.client) feeds applyFull/applyUpdate from the RemoteEvent.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Shared = ReplicatedStorage.Shared
+local EconomyShared = ReplicatedStorage.EconomyShared
 
-local Types = require(Shared.Types)
-local CurrencyConfig = require(Shared.CurrencyConfig)
+local Types = require(EconomyShared.Types)
+local CurrencyConfig = require(EconomyShared.CurrencyConfig)
 
 type CurrencyId = Types.CurrencyId
 type Wallet = Types.Wallet
