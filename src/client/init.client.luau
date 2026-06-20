@@ -10,6 +10,11 @@ local Shared = ReplicatedStorage.Shared
 
 local Constants = require(Shared.Constants)
 local WalletController = require(script.WalletController)
+local WalletGui = require(script.WalletGui)
+
+-- Build the read-only currency panel immediately. It renders configured
+-- defaults until the replica arrives, then refreshes from replicated values.
+WalletGui.mount()
 
 local Packages = ReplicatedStorage:FindFirstChild("Packages")
 if not Packages then

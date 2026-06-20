@@ -57,8 +57,11 @@ end
 -- client-side ReplicaController reports the PlayerWallet replica. Seeds the
 -- local mirror and wires per-key change listening.
 function WalletController.bind(replica: any)
+	-- Seed the local mirror and push the initial values out so any UI created
+	-- before the replica arrived (e.g. the wallet GUI) renders real balances.
 	for currency, balance in replica.Data.wallet do
 		wallet[currency] = balance
+		notify(currency, balance)
 	end
 
 	replica:ListenToWrite({ "wallet" }, function(currency: CurrencyId, balance: number)
