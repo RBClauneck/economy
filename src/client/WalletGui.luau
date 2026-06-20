@@ -68,6 +68,9 @@ function WalletGui.mount(): ScreenGui
 	screenGui.Name = "EconomyWallet"
 	screenGui.ResetOnSpawn = false
 	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	-- Ignore the Roblox top-bar inset / safe areas so scale-based centering
+	-- measures the full screen and the panel lands dead-centre.
+	screenGui.IgnoreGuiInset = true
 
 	-- Centered panel, hidden until the player opens the wallet.
 	local panel = Instance.new("Frame")
