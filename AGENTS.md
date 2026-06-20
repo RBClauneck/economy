@@ -33,3 +33,17 @@ Commits MUST follow the Conventional Commits specification. Commit messages must
 * **Commit Frequency & Verification:** Commit each change or group related commits. Do not wait for the entire session to finish. Always check the diff before creating a commit.
 * **Pull Requests (PR):** PRs must be opened sequentially in the correct order. Always ask the user for permission before creating a PR.
 * **Branch Check Before Working:** Before starting any work, always check the current branch. You must never work directly in the master or main branch.
+
+## Coding Standards & Code Generation
+
+When instructed to create, modify, or refactor code, agents MUST follow these principles:
+
+* **Strict Luau Typing:** All Luau files (`.luau`) MUST begin with `--!strict`. You must explicitly declare types for variables, function parameters, return values, and exported module tables.
+* **Structural Placement:** Before writing any code, verify its correct location based on the Client-Server separation model:
+  * `src/server/` for backend logic, DataStores, and security validations.
+  * `src/client/` for UI updates, local visual effects, and inputs.
+  * `src/shared/` for shared Constants, Types, Configs, and RemoteEvents.
+* **Zero-Trust Security (Server-Side):** Never trust data sent from the client. The server must strictly validate all inputs, permissions, and available funds before executing any economy mutation (e.g., adding/subtracting currency).
+* **Modularity:** Avoid monolithic scripts. Break complex logic into smaller, single-responsibility `ModuleScript` files.
+* **Non-Blocking Critical Paths:** Do not yield (e.g., `task.wait()`) inside transactional logic or critical loops unless explicitly wrapping a Roblox DataStore asynchronous call.
+* **Exploit-Prevention Documentation:** Leave clear, concise comments explaining the exploit-prevention mechanisms and data-sync strategies whenever handling a `RemoteEvent` or `RemoteFunction`.
