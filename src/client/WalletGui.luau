@@ -230,7 +230,7 @@ function WalletGui.mount(): ScreenGui
 		nameLabel.TextSize = 14
 		nameLabel.TextColor3 = COLOR_TEXT
 		nameLabel.TextXAlignment = Enum.TextXAlignment.Left
-		nameLabel.Text = string.format("%s (%s)", definition.displayName, definition.abbreviation)
+		nameLabel.Text = definition.displayName
 		nameLabel.Parent = frame
 
 		local balanceLabel = Instance.new("TextLabel")
