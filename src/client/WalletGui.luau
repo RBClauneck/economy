@@ -2,7 +2,8 @@
 -- WalletGui builds the read-only currency panel shown in the middle of the
 -- screen. It renders one row per registered currency with a live balance,
 -- a search bar to filter currencies by name, and an A→Z / Z→A sort toggle.
--- The list scrolls when it overflows.
+-- The list scrolls when it overflows. The panel is hidden by default and
+-- toggled by an "Open Wallet" launcher button and an in-panel close button.
 --
 -- This is presentation only: it reads from WalletController and never mutates
 -- economy state. Rows are created once and then shown/hidden and reordered in
@@ -68,7 +69,7 @@ function WalletGui.mount(): ScreenGui
 	screenGui.ResetOnSpawn = false
 	screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-	-- Centered panel.
+	-- Centered panel, hidden until the player opens the wallet.
 	local panel = Instance.new("Frame")
 	panel.Name = "Panel"
 	panel.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -76,21 +77,49 @@ function WalletGui.mount(): ScreenGui
 	panel.Size = PANEL_SIZE
 	panel.BackgroundColor3 = COLOR_PANEL
 	panel.BorderSizePixel = 0
+	panel.Visible = false
 	panel.Parent = screenGui
 	corner(panel, 12)
+
+	-- Inner content frame holds the list-laid-out children so the floating
+	-- close button (a direct child of the panel) is not captured by the
+	-- panel's UIListLayout.
+	local content = Instance.new("Frame")
+	content.Name = "Content"
+	content.Size = UDim2.fromScale(1, 1)
+	content.BackgroundTransparency = 1
+	content.Parent = panel
 
 	local padding = Instance.new("UIPadding")
 	padding.PaddingTop = UDim.new(0, 12)
 	padding.PaddingBottom = UDim.new(0, 12)
 	padding.PaddingLeft = UDim.new(0, 12)
 	padding.PaddingRight = UDim.new(0, 12)
-	padding.Parent = panel
+	padding.Parent = content
 
 	local layout = Instance.new("UIListLayout")
 	layout.FillDirection = Enum.FillDirection.Vertical
 	layout.SortOrder = Enum.SortOrder.LayoutOrder
 	layout.Padding = UDim.new(0, 8)
-	layout.Parent = panel
+	layout.Parent = content
+
+	-- Close button: floats at the panel's top-right, outside the content list.
+	local closeButton = Instance.new("TextButton")
+	closeButton.Name = "Close"
+	closeButton.AnchorPoint = Vector2.new(1, 0)
+	closeButton.Position = UDim2.new(1, -8, 0, 8)
+	closeButton.Size = UDim2.fromOffset(28, 28)
+	closeButton.BackgroundColor3 = COLOR_ACCENT
+	closeButton.BackgroundTransparency = 0
+	closeButton.BorderSizePixel = 0
+	closeButton.Font = Enum.Font.GothamBold
+	closeButton.TextSize = 16
+	closeButton.TextColor3 = COLOR_TEXT
+	closeButton.AutoButtonColor = true
+	closeButton.Text = "X"
+	closeButton.ZIndex = 2
+	closeButton.Parent = panel
+	corner(closeButton, 8)
 
 	-- Title.
 	local title = Instance.new("TextLabel")
@@ -103,7 +132,7 @@ function WalletGui.mount(): ScreenGui
 	title.TextColor3 = COLOR_TEXT
 	title.TextXAlignment = Enum.TextXAlignment.Left
 	title.Text = "Currencies"
-	title.Parent = panel
+	title.Parent = content
 
 	-- Controls row: search box + sort toggle.
 	local controls = Instance.new("Frame")
@@ -111,7 +140,7 @@ function WalletGui.mount(): ScreenGui
 	controls.LayoutOrder = 2
 	controls.Size = UDim2.new(1, 0, 0, 32)
 	controls.BackgroundTransparency = 1
-	controls.Parent = panel
+	controls.Parent = content
 
 	local searchBox = Instance.new("TextBox")
 	searchBox.Name = "Search"
@@ -159,7 +188,7 @@ function WalletGui.mount(): ScreenGui
 	scroller.ScrollBarImageColor3 = COLOR_ACCENT
 	scroller.CanvasSize = UDim2.new()
 	scroller.AutomaticCanvasSize = Enum.AutomaticSize.Y
-	scroller.Parent = panel
+	scroller.Parent = content
 	corner(scroller, 8)
 
 	local listLayout = Instance.new("UIListLayout")
@@ -265,6 +294,32 @@ function WalletGui.mount(): ScreenGui
 		if row then
 			row.balanceLabel.Text = formatNumber(balance)
 		end
+	end)
+
+	-- "Open Wallet" launcher, anchored bottom-left and always visible (a direct
+	-- child of the ScreenGui, outside the panel it toggles).
+	local openButton = Instance.new("TextButton")
+	openButton.Name = "OpenWallet"
+	openButton.AnchorPoint = Vector2.new(0, 1)
+	openButton.Position = UDim2.new(0, 16, 1, -16)
+	openButton.Size = UDim2.fromOffset(130, 36)
+	openButton.BackgroundColor3 = COLOR_PANEL
+	openButton.BorderSizePixel = 0
+	openButton.Font = Enum.Font.GothamMedium
+	openButton.TextSize = 14
+	openButton.TextColor3 = COLOR_TEXT
+	openButton.AutoButtonColor = true
+	openButton.Text = "Open Wallet"
+	openButton.Parent = screenGui
+	corner(openButton, 8)
+
+	-- Toggle wiring: open shows the panel, close hides it.
+	openButton.Activated:Connect(function()
+		panel.Visible = true
+	end)
+
+	closeButton.Activated:Connect(function()
+		panel.Visible = false
 	end)
 
 	refresh()
