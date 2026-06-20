@@ -195,12 +195,12 @@ local CurrencyConfig = require(ReplicatedStorage.EconomyShared.CurrencyConfig)
 
 ### Base currencies (always present, no registration)
 
-| id | displayName | abbreviation | default | max |
-| :--- | :--- | :--- | :--- | :--- |
-| `coin` | Coin | `C` | `0` | `MAX_SAFE_AMOUNT` |
-| `copper` | Copper | `Cu` | `0` | `MAX_SAFE_AMOUNT` |
-| `silver` | Silver | `Ag` | `0` | `MAX_SAFE_AMOUNT` |
-| `gold` | Gold | `Au` | `0` | `MAX_SAFE_AMOUNT` |
+| id | displayName | default | max |
+| :--- | :--- | :--- | :--- |
+| `coin` | Coin | `0` | `MAX_SAFE_AMOUNT` |
+| `copper` | Copper | `0` | `MAX_SAFE_AMOUNT` |
+| `silver` | Silver | `0` | `MAX_SAFE_AMOUNT` |
+| `gold` | Gold | `0` | `MAX_SAFE_AMOUNT` |
 
 ### `CurrencyConfig.register(options) → CurrencyDefinition`
 
@@ -214,7 +214,6 @@ definition. Asserts (raises) on invalid input.
 | :--- | :--- | :--- | :--- | :--- |
 | `id` | `string` | ✅ | — | Non-empty, **lowercase**, not already registered. |
 | `displayName` | `string` | — | `id` | Human-readable label. |
-| `abbreviation` | `string` | — | first char of `id`, upper | Short UI label. |
 | `default` | `number` | — | `0` | `>= 0`. Starting balance for new profiles. |
 | `max` | `number` | — | `MAX_SAFE_AMOUNT` | `>= default`. Hard mutation ceiling. |
 
@@ -224,7 +223,6 @@ definition. Asserts (raises) on invalid input.
 CurrencyConfig.register({
     id = "gem",
     displayName = "Gem",
-    abbreviation = "Gm",
     max = 1_000_000,
 })
 ```
@@ -250,7 +248,7 @@ and its definitions are frozen — iterate, never mutate.
 
 ```lua
 for _, def in CurrencyConfig.all() do
-    print(def.displayName, def.abbreviation, def.default, def.max)
+    print(def.displayName, def.default, def.max)
 end
 ```
 
@@ -347,7 +345,6 @@ export type CurrencyId = string
 export type CurrencyDefinition = {
     id: CurrencyId,        -- canonical key, e.g. "gold"
     displayName: string,   -- human label, e.g. "Gold"
-    abbreviation: string,  -- short UI label, e.g. "Au"
     default: number,       -- starting balance for a fresh profile
     max: number,           -- hard ceiling enforced on every mutation
     isBase: boolean,       -- true for the four built-in base currencies
@@ -381,7 +378,6 @@ export type WalletSyncPayload =
 export type CustomCurrencyOptions = {
     id: CurrencyId,
     displayName: string?,
-    abbreviation: string?,
     default: number?,
     max: number?,
 }

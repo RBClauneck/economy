@@ -39,7 +39,7 @@ and `gold` — and supports registering additional **custom currencies** at boot
 
   ```lua
   local CurrencyConfig = require(ReplicatedStorage.Shared.CurrencyConfig)
-  CurrencyConfig.register({ id = "gem", displayName = "Gem", abbreviation = "Gm", max = 1_000_000 })
+  CurrencyConfig.register({ id = "gem", displayName = "Gem", max = 1_000_000 })
   ```
 
 * **Mutate balances** from any trusted server module via the core API

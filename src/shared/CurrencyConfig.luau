@@ -22,10 +22,10 @@ local CurrencyConfig = {}
 
 -- The four built-in base currencies, lowest to highest value by convention.
 local BASE_CURRENCIES: { CurrencyDefinition } = {
-	{ id = "coin", displayName = "Coin", abbreviation = "C", default = 0, max = Constants.MAX_SAFE_AMOUNT, isBase = true },
-	{ id = "copper", displayName = "Copper", abbreviation = "Cu", default = 0, max = Constants.MAX_SAFE_AMOUNT, isBase = true },
-	{ id = "silver", displayName = "Silver", abbreviation = "Ag", default = 0, max = Constants.MAX_SAFE_AMOUNT, isBase = true },
-	{ id = "gold", displayName = "Gold", abbreviation = "Au", default = 0, max = Constants.MAX_SAFE_AMOUNT, isBase = true },
+	{ id = "coin", displayName = "Coin", default = 0, max = Constants.MAX_SAFE_AMOUNT, isBase = true },
+	{ id = "copper", displayName = "Copper", default = 0, max = Constants.MAX_SAFE_AMOUNT, isBase = true },
+	{ id = "silver", displayName = "Silver", default = 0, max = Constants.MAX_SAFE_AMOUNT, isBase = true },
+	{ id = "gold", displayName = "Gold", default = 0, max = Constants.MAX_SAFE_AMOUNT, isBase = true },
 }
 
 -- O(1) lookup map and insertion-ordered list. Kept in sync by `add`.
@@ -45,7 +45,6 @@ end
 export type CustomCurrencyOptions = {
 	id: CurrencyId,
 	displayName: string?,
-	abbreviation: string?,
 	default: number?,
 	max: number?,
 }
@@ -69,7 +68,6 @@ function CurrencyConfig.register(options: CustomCurrencyOptions): CurrencyDefini
 	local definition: CurrencyDefinition = table.freeze({
 		id = id,
 		displayName = options.displayName or id,
-		abbreviation = options.abbreviation or string.upper(string.sub(id, 1, 1)),
 		default = default,
 		max = max,
 		isBase = false,

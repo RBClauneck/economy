@@ -12,7 +12,6 @@ export type CurrencyId = string
 export type CurrencyDefinition = {
 	id: CurrencyId, -- canonical key, e.g. "gold"
 	displayName: string, -- human readable label, e.g. "Gold"
-	abbreviation: string, -- short label for UI, e.g. "G"
 	default: number, -- starting balance for a fresh profile
 	max: number, -- hard ceiling enforced on every mutation
 	isBase: boolean, -- true for the built-in base currencies

@@ -24,7 +24,7 @@ local Replication = require(script.Replication)
 -- their own currencies here (or before requiring this script) and they will
 -- be seeded into every wallet automatically. Base currencies — coin, copper,
 -- silver, gold — are always present without registration.
--- CurrencyConfig.register({ id = "gem", displayName = "Gem", abbreviation = "Gm", max = 1_000_000 })
+-- CurrencyConfig.register({ id = "gem", displayName = "Gem", max = 1_000_000 })
 
 -- Configure the session-locked store with this library's default profile shape.
 ProfileStore.setup(Constants.DATASTORE_NAME, function()
