@@ -1,14 +1,14 @@
 --!strict
 -- Economy server bootstrap.
 --
--- Wires player lifecycle into the CurrencyService: on join, load the DataKeep
--- Keep and create the ReplicaService replica, then bind them as a session; on
--- leave, release persistence and drop the session.
+-- Wires player lifecycle into the in-house persistence and replication stack:
+--   - ProfileStore  : custom session-locked DataStore wrapper (auto-save +
+--                     BindToClose live inside it).
+--   - Replication   : standard RemoteEvent (WalletSyncEvent) for Server ->
+--                     Client wallet sync.
+--   - CurrencyService: the authoritative balance API.
 --
--- DataKeep and ReplicaService are expected under ReplicatedStorage/Packages
--- (or wherever the host place vendors them). The requires are resolved lazily
--- so this library can be dropped into a place without the packages failing to
--- compile the rest of the economy core.
+-- No third-party packages are required; everything ships with the library.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -17,6 +17,8 @@ local Shared = ReplicatedStorage.Shared
 local CurrencyConfig = require(Shared.CurrencyConfig)
 local Constants = require(Shared.Constants)
 local CurrencyService = require(script.CurrencyService)
+local ProfileStore = require(script.ProfileStore)
+local Replication = require(script.Replication)
 
 -- Example of declaring a custom currency at boot. Host places can register
 -- their own currencies here (or before requiring this script) and they will
@@ -24,50 +26,37 @@ local CurrencyService = require(script.CurrencyService)
 -- silver, gold — are always present without registration.
 -- CurrencyConfig.register({ id = "gem", displayName = "Gem", abbreviation = "Gm", max = 1_000_000 })
 
+-- Configure the session-locked store with this library's default profile shape.
+ProfileStore.setup(Constants.DATASTORE_NAME, function()
+	return { wallet = CurrencyConfig.buildDefaultWallet() }
+end)
+
+-- Answer client snapshot (re)requests using only server-authoritative state.
+Replication.onRequest(function(player: Player)
+	return CurrencyService.getWallet(player.UserId)
+end)
+
 local function onPlayerAdded(player: Player)
-	-- Persistence (DataKeep) and replication (ReplicaService) are resolved by
-	-- the host place. The economy core treats them as opaque handles and only
-	-- relies on the contracts used in CurrencyService.
-	local Packages = ReplicatedStorage:FindFirstChild("Packages")
-	if not Packages then
-		warn("[economy] Packages folder not found; cannot load profile for " .. player.Name)
+	local profile = ProfileStore.loadAsync(player.UserId)
+	if not profile then
+		-- Another live server still holds the lock (or the DataStore is down).
+		player:Kick("Your economy data is busy on another server. Please rejoin in a moment.")
 		return
 	end
 
-	local DataKeep = require(Packages:WaitForChild("DataKeep")) :: any
-	local ReplicaService = require(Packages:WaitForChild("ReplicaService")) :: any
-
-	local store = DataKeep.GetStore(Constants.DATASTORE_NAME, {
-		wallet = CurrencyConfig.buildDefaultWallet(),
-	}):expect()
-
-	local keep = store:LoadKeep("Player_" .. player.UserId):expect()
-	if not keep then
-		player:Kick("Economy profile failed to load. Please rejoin.")
-		return
-	end
-
-	keep:Reconcile()
-	keep.Releasing:Connect(function()
-		player:Kick("Economy profile released. Please rejoin.")
-	end)
-
+	-- The player may have left while the DataStore call yielded; release the
+	-- lock we just took rather than leaking it.
 	if player.Parent ~= Players then
-		keep:Release()
+		ProfileStore.release(player.UserId)
 		return
 	end
 
-	local replica = ReplicaService.NewReplica({
-		ClassToken = ReplicaService.NewClassToken(Constants.WALLET_REPLICA_CLASS),
-		Data = { wallet = keep.Data.wallet },
-		Replication = player,
-	})
-
-	CurrencyService.bindSession(player.UserId, keep, replica)
+	CurrencyService.bindSession(player, profile)
 end
 
 local function onPlayerRemoving(player: Player)
 	CurrencyService.unbindSession(player.UserId)
+	ProfileStore.release(player.UserId)
 end
 
 for _, player in Players:GetPlayers() do

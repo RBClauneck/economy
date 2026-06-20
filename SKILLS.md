@@ -26,8 +26,8 @@ Stop at the first rung that holds:
 
 1. **Does it belong in Shared?** Constants, Types, Configs, and RemoteEvents go in `src/shared`.
 2. **Can the Client be trusted?** Never. All economy mutations (adding/subtracting money, purchases) MUST be verified and processed in `src/server`. The Client (`src/client`) only requests actions and updates UI.
-3. **Is it a DataStore operation?** Route all Roblox DataStore reads/writes through a dedicated service manager in `src/server`. Do not scatter DataStore calls across multiple server scripts.
-4. **Is it a state mutation?** Update the server-side memory first, verify the DataStore queue, and then fire a RemoteEvent to sync the Client's visual state.
+3. **Is it a DataStore operation?** Route all Roblox DataStore reads/writes through the custom in-house session-locked DataStore wrapper (`ProfileStore`) in `src/server`. Do not scatter DataStore calls across multiple server scripts and do not reintroduce third-party persistence libraries.
+4. **Is it a state mutation?** Update the server-side memory first, then sync the Client's visual state by firing the wallet RemoteEvent (`WalletSyncEvent`) from the server. No third-party replication library is used.
 
 ## Rules
 

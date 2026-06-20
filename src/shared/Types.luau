@@ -30,4 +30,18 @@ export type MutationResult = {
 	reason: string?, -- failure reason when ok == false
 }
 
+-- The full persisted payload for one player, written through the in-house
+-- session-locked DataStore wrapper. Extend this as the economy grows; the
+-- wrapper reconciles missing fields against the configured default.
+export type ProfileData = {
+	wallet: Wallet,
+}
+
+-- Messages sent Server -> Client over the WalletSyncEvent RemoteEvent. A
+-- tagged union: "full" seeds the entire wallet on join, "update" carries a
+-- single changed balance. The client treats every payload as read-only.
+export type WalletSyncPayload =
+	{ kind: "full", wallet: Wallet }
+	| { kind: "update", currency: CurrencyId, balance: number }
+
 return nil

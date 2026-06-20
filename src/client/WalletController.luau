@@ -1,11 +1,12 @@
 --!strict
 -- WalletController is the read-only client view of the player's wallet. It
--- observes the ReplicaService replica created by the server and exposes the
--- replicated balances plus a change signal for UI to subscribe to.
+-- holds the balances delivered over the WalletSyncEvent RemoteEvent and exposes
+-- a change signal for UI to subscribe to.
 --
--- This module contains NO mutation logic. The client never requests economy
--- changes; it only reflects what the server has already decided. All values
--- here are treated as strictly read-only.
+-- This module contains NO mutation logic and no networking. The client never
+-- requests economy changes; it only reflects what the server has already
+-- decided. All values here are treated as strictly read-only. The bootstrap
+-- (init.client) feeds applyFull/applyUpdate from the RemoteEvent.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Shared = ReplicatedStorage.Shared
@@ -18,7 +19,7 @@ type Wallet = Types.Wallet
 
 local WalletController = {}
 
--- Local mirror of the replicated wallet. Updated only from replica events.
+-- Local mirror of the wallet. Updated only from server sync messages.
 local wallet: Wallet = {}
 
 -- Listeners notified whenever a balance changes: (currency, newBalance).
@@ -31,8 +32,8 @@ local function notify(currency: CurrencyId, balance: number)
 	end
 end
 
--- Returns the last replicated balance for a currency, or its configured
--- default if nothing has replicated yet.
+-- Returns the last synced balance for a currency, or its configured default
+-- if nothing has synced yet.
 function WalletController.getBalance(currency: CurrencyId): number
 	local value = wallet[currency]
 	if value ~= nil then
@@ -53,21 +54,21 @@ function WalletController.onChanged(listener: Listener): () -> ()
 	end
 end
 
--- Binds the controller to a ReplicaController replica. Called once the
--- client-side ReplicaController reports the PlayerWallet replica. Seeds the
--- local mirror and wires per-key change listening.
-function WalletController.bind(replica: any)
-	-- Seed the local mirror and push the initial values out so any UI created
-	-- before the replica arrived (e.g. the wallet GUI) renders real balances.
-	for currency, balance in replica.Data.wallet do
+-- Applies a full wallet snapshot from the server (the "full" sync payload sent
+-- on join / on request). Seeds every balance and notifies listeners so UI
+-- built before the snapshot arrived renders real balances.
+function WalletController.applyFull(snapshot: Wallet)
+	for currency, balance in snapshot do
 		wallet[currency] = balance
 		notify(currency, balance)
 	end
+end
 
-	replica:ListenToWrite({ "wallet" }, function(currency: CurrencyId, balance: number)
-		wallet[currency] = balance
-		notify(currency, balance)
-	end)
+-- Applies a single balance change from the server (the "update" sync payload
+-- sent after every mutation).
+function WalletController.applyUpdate(currency: CurrencyId, balance: number)
+	wallet[currency] = balance
+	notify(currency, balance)
 end
 
 return WalletController
