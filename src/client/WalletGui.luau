@@ -76,7 +76,7 @@ function WalletGui.mount(): ScreenGui
 	local panel = Instance.new("Frame")
 	panel.Name = "Panel"
 	panel.AnchorPoint = Vector2.new(0.5, 0.5)
-	panel.Position = UDim2.fromScale(0.5, 0.5)
+	panel.Position = UDim2.new(0.5, 0, 0.5, 0)
 	panel.Size = PANEL_SIZE
 	panel.BackgroundColor3 = COLOR_PANEL
 	panel.BorderSizePixel = 0
@@ -304,7 +304,7 @@ function WalletGui.mount(): ScreenGui
 	local openButton = Instance.new("TextButton")
 	openButton.Name = "OpenWallet"
 	openButton.AnchorPoint = Vector2.new(0, 1)
-	openButton.Position = UDim2.new(0, 16, 1, -16)
+	openButton.Position = UDim2.new(0, 20, 1, -20)
 	openButton.Size = UDim2.fromOffset(130, 36)
 	openButton.BackgroundColor3 = COLOR_PANEL
 	openButton.BorderSizePixel = 0
