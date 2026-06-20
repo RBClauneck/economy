@@ -24,9 +24,9 @@ local DataStoreService = game:GetService("DataStoreService")
 local HttpService = game:GetService("HttpService")
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local EconomyShared = ReplicatedStorage.EconomyShared
-local Types = require(EconomyShared.Types)
-local Constants = require(EconomyShared.Constants)
+local EconomyShared = ReplicatedStorage:WaitForChild("EconomyShared")
+local Types = require(EconomyShared:WaitForChild("Types"))
+local Constants = require(EconomyShared:WaitForChild("Constants"))
 
 type ProfileData = Types.ProfileData
 

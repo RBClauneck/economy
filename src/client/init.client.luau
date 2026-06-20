@@ -8,9 +8,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local EconomyShared = ReplicatedStorage:WaitForChild("EconomyShared")
 
-local Constants = require(EconomyShared.Constants)
-local WalletController = require(script.WalletController)
-local WalletGui = require(script.WalletGui)
+local Constants = require(EconomyShared:WaitForChild("Constants"))
+local WalletController = require(script:WaitForChild("WalletController"))
+local WalletGui = require(script:WaitForChild("WalletGui"))
 
 -- Build the read-only currency panel immediately. It renders configured
 -- defaults until the first snapshot arrives, then refreshes from synced values.

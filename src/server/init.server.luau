@@ -12,13 +12,13 @@
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local EconomyShared = ReplicatedStorage.EconomyShared
+local EconomyShared = ReplicatedStorage:WaitForChild("EconomyShared")
 
-local CurrencyConfig = require(EconomyShared.CurrencyConfig)
-local Constants = require(EconomyShared.Constants)
-local CurrencyService = require(script.CurrencyService)
-local ProfileStore = require(script.ProfileStore)
-local Replication = require(script.Replication)
+local CurrencyConfig = require(EconomyShared:WaitForChild("CurrencyConfig"))
+local Constants = require(EconomyShared:WaitForChild("Constants"))
+local CurrencyService = require(script:WaitForChild("CurrencyService"))
+local ProfileStore = require(script:WaitForChild("ProfileStore"))
+local Replication = require(script:WaitForChild("Replication"))
 
 -- Example of declaring a custom currency at boot. Host places can register
 -- their own currencies here (or before requiring this script) and they will

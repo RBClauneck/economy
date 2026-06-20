@@ -10,10 +10,10 @@
 -- the server the sole dictator of balances.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local EconomyShared = ReplicatedStorage.EconomyShared
+local EconomyShared = ReplicatedStorage:WaitForChild("EconomyShared")
 
-local Types = require(EconomyShared.Types)
-local Constants = require(EconomyShared.Constants)
+local Types = require(EconomyShared:WaitForChild("Types"))
+local Constants = require(EconomyShared:WaitForChild("Constants"))
 
 type Wallet = Types.Wallet
 type CurrencyId = Types.CurrencyId

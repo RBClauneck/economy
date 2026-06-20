@@ -11,11 +11,11 @@
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local EconomyShared = ReplicatedStorage.EconomyShared
+local EconomyShared = ReplicatedStorage:WaitForChild("EconomyShared")
 
-local Types = require(EconomyShared.Types)
-local CurrencyConfig = require(EconomyShared.CurrencyConfig)
-local WalletController = require(script.Parent.WalletController)
+local Types = require(EconomyShared:WaitForChild("Types"))
+local CurrencyConfig = require(EconomyShared:WaitForChild("CurrencyConfig"))
+local WalletController = require(script.Parent:WaitForChild("WalletController"))
 
 type CurrencyId = Types.CurrencyId
 type CurrencyDefinition = Types.CurrencyDefinition

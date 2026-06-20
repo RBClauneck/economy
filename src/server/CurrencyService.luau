@@ -14,13 +14,13 @@
 -- exposed to trusted server callers only.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local EconomyShared = ReplicatedStorage.EconomyShared
+local EconomyShared = ReplicatedStorage:WaitForChild("EconomyShared")
 
-local Types = require(EconomyShared.Types)
-local CurrencyConfig = require(EconomyShared.CurrencyConfig)
-local Validation = require(script.Parent.Validation)
-local ProfileStore = require(script.Parent.ProfileStore)
-local Replication = require(script.Parent.Replication)
+local Types = require(EconomyShared:WaitForChild("Types"))
+local CurrencyConfig = require(EconomyShared:WaitForChild("CurrencyConfig"))
+local Validation = require(script.Parent:WaitForChild("Validation"))
+local ProfileStore = require(script.Parent:WaitForChild("ProfileStore"))
+local Replication = require(script.Parent:WaitForChild("Replication"))
 
 type CurrencyId = Types.CurrencyId
 type Wallet = Types.Wallet
