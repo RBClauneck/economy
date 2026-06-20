@@ -125,11 +125,16 @@ function ProfileStore.setup(storeName: string, factory: () -> ProfileData)
 	started = true
 
 	-- Auto-save loop: periodically persist every active profile (which also
-	-- refreshes its session-lock heartbeat).
+	-- refreshes its session-lock heartbeat). Snapshot the profiles first so a
+	-- concurrent release (PlayerRemoving) can't mutate the set mid-iteration.
 	task.spawn(function()
 		while true do
 			task.wait(Constants.AUTO_SAVE_INTERVAL)
+			local snapshot: { Profile } = {}
 			for _, profile in active do
+				table.insert(snapshot, profile)
+			end
+			for _, profile in snapshot do
 				task.spawn(ProfileStore.save, profile)
 			end
 		end
