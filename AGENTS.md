@@ -40,10 +40,11 @@ When instructed to create, modify, or refactor code, agents MUST follow these pr
 
 * **Strict Luau Typing:** All Luau files (`.luau`) MUST begin with `--!strict`. You must explicitly declare types for variables, function parameters, return values, and exported module tables.
 * **Structural Placement:** Before writing any code, verify its correct location based on the Client-Server separation model:
-  * `src/server/` for backend logic, DataStores, and security validations.
-  * `src/client/` for UI updates, local visual effects, and inputs.
+  * `src/server/` for backend logic, DataStores, and providing the core economy API to other server modules.
+  * `src/client/` for UI updates and reading replicated economy data.
   * `src/shared/` for shared Constants, Types, Configs, and RemoteEvents.
-* **Zero-Trust Security (Server-Side):** Never trust data sent from the client. The server must strictly validate all inputs, permissions, and available funds before executing any economy mutation (e.g., adding/subtracting currency).
+* **Data Management & State Sync:** You MUST use **DataKeep** for all Roblox DataStore operations to ensure safe session locking and strict typing. To synchronize state from the server to the client, you MUST use **ReplicaService**. The client must treat all replicated data as strictly read-only.
+* **Internal API Validation:** As a core library, this module does not process client inputs directly. However, its server-side functions (e.g., `addMoney`, `minusMoney`) MUST rigorously validate all arguments passed by other server modules. Always check for invalid numbers (e.g., block negative values, `NaN`, floating-point errors, or integer overflows) before executing any economy mutation to prevent cascading errors from other systems.
+* **Read-Only Client:** The client side of this library exists solely to observe state changes (via ReplicaService) and update the GUI. It must not contain logic to request economy mutations.
 * **Modularity:** Avoid monolithic scripts. Break complex logic into smaller, single-responsibility `ModuleScript` files.
 * **Non-Blocking Critical Paths:** Do not yield (e.g., `task.wait()`) inside transactional logic or critical loops unless explicitly wrapping a Roblox DataStore asynchronous call.
-* **Exploit-Prevention Documentation:** Leave clear, concise comments explaining the exploit-prevention mechanisms and data-sync strategies whenever handling a `RemoteEvent` or `RemoteFunction`.
