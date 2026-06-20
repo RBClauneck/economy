@@ -28,6 +28,33 @@ If you are an AI assistant (e.g., Claude Code), you MUST adhere to the following
 2. Ensure all data mutations happen on the server using **DataKeep**, and sync state to the client exclusively via **ReplicaService**. Treat the client state as strictly read-only.
 3. All commits must strictly follow the Conventional Commits specification outlined in `AGENTS.md`.
 
+## 💰 Currency System
+
+The economy ships with four **base currencies** — `coin`, `copper`, `silver`,
+and `gold` — and supports registering additional **custom currencies** at boot.
+
+* **Definitions** live in `src/shared/CurrencyConfig.luau`, the single source of
+  truth read by both server and client.
+* **Register a custom currency** before profiles load:
+
+  ```lua
+  local CurrencyConfig = require(ReplicatedStorage.Shared.CurrencyConfig)
+  CurrencyConfig.register({ id = "gem", displayName = "Gem", abbreviation = "Gm", max = 1_000_000 })
+  ```
+
+* **Mutate balances** from any trusted server module via the core API
+  (`src/server/CurrencyService.luau`); every call is validated against NaN,
+  infinities, negatives, non-integers, overflow and the per-currency ceiling:
+
+  ```lua
+  CurrencyService.addMoney(userId, "gold", 50)
+  CurrencyService.minusMoney(userId, "coin", 10)
+  ```
+
+* **Read balances on the client** through the read-only
+  `src/client/WalletController.luau`, which observes the replicated wallet and
+  exposes an `onChanged` signal for UI.
+
 ## 🚀 Installation (For Place Repositories)
 
 To integrate this library into your main place repository, add it as a Git submodule:
