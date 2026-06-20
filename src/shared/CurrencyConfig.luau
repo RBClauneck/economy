@@ -12,8 +12,8 @@
 -- That lets get/exists stay O(1) while all() returns a deterministic order
 -- without re-sorting on every call.
 
-local Types = require(script.Parent.Types)
-local Constants = require(script.Parent.Constants)
+local Types = require(script.Parent:WaitForChild("Types"))
+local Constants = require(script.Parent:WaitForChild("Constants"))
 
 type CurrencyId = Types.CurrencyId
 type CurrencyDefinition = Types.CurrencyDefinition
