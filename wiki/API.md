@@ -468,10 +468,13 @@ If `loadAsync` returns `nil`, the bootstrap kicks the player with:
    mkdir -p packages
    git submodule add https://github.com/RBClauneck/economy.git packages/economy
    ```
-2. **Map the source folders** in your host Rojo project so that:
+2. **Map the source folders** in your host Rojo project (`default.project.json`
+   at your repo root) so that:
    - `packages/economy/src/shared` → `ReplicatedStorage.EconomyShared` *(required exact path)*
    - `packages/economy/src/server` → somewhere under `ServerScriptService`
    - `packages/economy/src/client` → somewhere under `StarterPlayer.StarterPlayerScripts`
+
+   See [§10.1](#101-rojo-defaultprojectjson-copy-paste) for a copy-paste config.
 3. **Ensure the bootstraps run.** `src/server/init.server.luau` and
    `src/client/init.client.luau` wire player lifecycle, persistence, replication
    and the read-only UI automatically.
@@ -479,6 +482,143 @@ If `loadAsync` returns `nil`, the bootstrap kicks the player with:
    and client, via `CurrencyConfig.register(...)`.
 5. **Mutate balances only through `CurrencyService`** from trusted server
    modules; **read on the client only through `WalletController`**.
+
+### 10.1 Rojo `default.project.json` (copy-paste)
+
+With the library vendored at `packages/economy/`, your host project layout is:
+
+```
+root/
+├── default.project.json   ← your project file (the config below)
+├── src/
+│   ├── shared/            ← your own shared modules
+│   ├── server/            ← your own server modules
+│   └── client/            ← your own client modules
+└── packages/
+    └── economy/           ← this library (submodule)
+        └── src/{shared,server,client}
+```
+
+The **minimal** mapping — drop the three `Economy*` entries alongside your own
+folders. The economy entry **names** (`EconomyShared`/`EconomyServer`/
+`EconomyClient`) are up to you, **except** the shared folder, which must be a
+child of `ReplicatedStorage` named exactly `EconomyShared` (the library
+hard-codes `ReplicatedStorage.EconomyShared`):
+
+```json
+{
+  "name": "your-game",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "Shared": {
+        "$path": "src/shared"
+      },
+      "EconomyShared": {
+        "$path": "packages/economy/src/shared"
+      }
+    },
+    "ServerScriptService": {
+      "Server": {
+        "$path": "src/server"
+      },
+      "EconomyServer": {
+        "$path": "packages/economy/src/server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Client": {
+          "$path": "src/client"
+        },
+        "EconomyClient": {
+          "$path": "packages/economy/src/client"
+        }
+      }
+    }
+  }
+}
+```
+
+A **complete** project file including the usual `Workspace`/`Lighting`/
+`SoundService` defaults (use this as a full `root/default.project.json`):
+
+```json
+{
+  "name": "your-game",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "Shared": {
+        "$path": "src/shared"
+      },
+      "EconomyShared": {
+        "$path": "packages/economy/src/shared"
+      }
+    },
+    "ServerScriptService": {
+      "Server": {
+        "$path": "src/server"
+      },
+      "EconomyServer": {
+        "$path": "packages/economy/src/server"
+      }
+    },
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Client": {
+          "$path": "src/client"
+        },
+        "EconomyClient": {
+          "$path": "packages/economy/src/client"
+        }
+      }
+    },
+    "Workspace": {
+      "$properties": {
+        "FilteringEnabled": true
+      },
+      "Baseplate": {
+        "$className": "Part",
+        "$properties": {
+          "Anchored": true,
+          "Color": [0.38823, 0.37254, 0.38823],
+          "Locked": true,
+          "Position": [0, -10, 0],
+          "Size": [512, 20, 512]
+        }
+      }
+    },
+    "Lighting": {
+      "$properties": {
+        "Ambient": [0, 0, 0],
+        "Brightness": 2,
+        "GlobalShadows": true,
+        "Outlines": false,
+        "Technology": "Voxel"
+      }
+    },
+    "SoundService": {
+      "$properties": {
+        "RespectFilteringEnabled": true
+      }
+    }
+  }
+}
+```
+
+With this in place, the require paths used throughout this document resolve as:
+
+| Module | Require path in your code |
+| :--- | :--- |
+| `CurrencyService` | `ServerScriptService.EconomyServer.CurrencyService` |
+| `CurrencyConfig` | `ReplicatedStorage.EconomyShared.CurrencyConfig` |
+| `Types` / `Constants` | `ReplicatedStorage.EconomyShared.{Types,Constants}` |
+| `WalletController` | `StarterPlayer.StarterPlayerScripts.EconomyClient.WalletController` |
+
+> The earlier examples in this doc require from `ServerScriptService.Server` /
+> `StarterPlayerScripts.Client` for brevity; substitute the `Economy*` names
+> from your project file. Only `ReplicatedStorage.EconomyShared` is fixed.
 
 ### End-to-end example
 
