@@ -1,0 +1,54 @@
+name: Sync Test Branch
+
+# Automated testing branches for non-master updates.
+#
+# Any push to a branch OTHER than master is a work-in-progress change that must
+# be validated in this package's dedicated test repository. We dispatch a
+# generic `update_submodule` event (mode=testing) to that repo, whose listener
+# creates or updates a `test/package-testing` branch pointing the submodule at
+# the pushed commit. The test repo is a fixed 1:1 partner of this package, so it
+# is referenced directly (this is not the open-ended consumer list).
+on:
+  push:
+    branches-ignore:
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-test-branch-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      TEST_REPO: RBClauneck/server-test
+    steps:
+      - name: Dispatch test-branch update to the test repo
+        env:
+          GH_TOKEN:       ${{ secrets.DISPATCH_TOKEN }}
+          PACKAGE:        ${{ github.event.repository.name }}
+          SUBMODULE_PATH: packages/economy
+          SOURCE_BRANCH:  ${{ github.ref_name }}
+          SOURCE_SHA:     ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GH_TOKEN:-}" ]; then
+            echo "DISPATCH_TOKEN is not configured - skipping test sync."
+            echo "Add a PAT (Contents: read/write on $TEST_REPO) as the"
+            echo "DISPATCH_TOKEN secret to enable the test-branch update."
+            exit 0
+          fi
+          echo "-> $TEST_REPO (testing): $PACKAGE @ ${SOURCE_SHA:0:7} from $SOURCE_BRANCH"
+          jq -n \
+            --arg mode   "testing" \
+            --arg pkg    "$PACKAGE" \
+            --arg path   "$SUBMODULE_PATH" \
+            --arg branch "$SOURCE_BRANCH" \
+            --arg sha    "$SOURCE_SHA" \
+            '{event_type:"update_submodule",
+              client_payload:{mode:$mode, package:$pkg, submodule_path:$path,
+                              source_branch:$branch, source_sha:$sha}}' \
+          | gh api --method POST "repos/$TEST_REPO/dispatches" --input -
