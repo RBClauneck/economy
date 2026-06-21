@@ -1,0 +1,64 @@
+name: Notify Master Subscribers
+
+# Decoupled listener model for master-branch updates.
+#
+# This package does NOT hardcode its consumers. On every push to master it
+# emits a generic `update_submodule` repository_dispatch (mode=production) to
+# every repo listed in the `MASTER_SUBSCRIBERS` Actions variable. Any repo can
+# subscribe independently by:
+#   1. adding a listener for `repository_dispatch: types: [update_submodule]`
+#      (see the shared pattern in RBEngine/actions), and
+#   2. registering its `owner/repo` in this package's MASTER_SUBSCRIBERS variable.
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: notify-master-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  broadcast:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Broadcast master update to subscribers
+        env:
+          GH_TOKEN:       ${{ secrets.DISPATCH_TOKEN }}
+          SUBSCRIBERS:    ${{ vars.MASTER_SUBSCRIBERS }}
+          PACKAGE:        ${{ github.event.repository.name }}
+          SUBMODULE_PATH: packages/economy
+          SOURCE_BRANCH:  ${{ github.ref_name }}
+          SOURCE_SHA:     ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [ -z "${GH_TOKEN:-}" ]; then
+            echo "DISPATCH_TOKEN is not configured - skipping broadcast."
+            echo "Add a PAT (Contents: read/write on the subscriber repos) as the"
+            echo "DISPATCH_TOKEN secret to enable cross-repository submodule updates."
+            exit 0
+          fi
+          # Normalize the subscriber list: accept comma- or whitespace-separated
+          # `owner/repo` entries and trim blanks.
+          SUBSCRIBERS_LIST="$(printf '%s' "${SUBSCRIBERS:-}" | tr ',' ' ' | xargs || true)"
+          if [ -z "$SUBSCRIBERS_LIST" ]; then
+            echo "No subscribers configured - set the MASTER_SUBSCRIBERS variable"
+            echo "to a list of 'owner/repo' entries to broadcast master updates."
+            exit 0
+          fi
+          for repo in $SUBSCRIBERS_LIST; do
+            echo "-> $repo (production): $PACKAGE @ ${SOURCE_SHA:0:7} from $SOURCE_BRANCH"
+            jq -n \
+              --arg mode   "production" \
+              --arg pkg    "$PACKAGE" \
+              --arg path   "$SUBMODULE_PATH" \
+              --arg branch "$SOURCE_BRANCH" \
+              --arg sha    "$SOURCE_SHA" \
+              '{event_type:"update_submodule",
+                client_payload:{mode:$mode, package:$pkg, submodule_path:$path,
+                                source_branch:$branch, source_sha:$sha}}' \
+            | gh api --method POST "repos/$repo/dispatches" --input -
+          done
