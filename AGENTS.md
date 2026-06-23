@@ -7,6 +7,7 @@ This repository contains the core economy library for RBClauneck. All AI agents 
 **Strict Rules:**
 - Agents must ask for the user's approval before editing `AGENTS.md` or `SKILLS.md`.
 - Never work directly on the `master` or `main` branch.
+- Always verify if your current task aligns with the active branch. If it does not, create a new branch. Do not create a new branch if you are continuing existing work on the appropriate branch.
 
 The root `AGENTS.md` and `SKILLS.md` files must remain universally applicable to the entire repository. If you conceptualize a new instruction or skill that is specific to a certain context and not universal, create it within the `.agents/` or `.skills/` directories instead.
 
@@ -15,6 +16,7 @@ The root `AGENTS.md` and `SKILLS.md` files must remain universally applicable to
 - `.skills/{type}/{name}.md`
 
 **Indexing Rules:**
+- All indexes must be written within this `AGENTS.md` file.
 - All references and indexing for files within the `.agents/` and `.skills/` directories MUST be written as bullet points directly within this `AGENTS.md` file.
 - Do not use or create central index files (such as `README.md`) inside the `.agents/` or `.skills/` directories.
 
