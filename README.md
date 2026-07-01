@@ -10,7 +10,6 @@ It is built with a secure, exploit-proof architecture, utilizing modern state sy
 * **In-House Persistence & State Sync:** Ships its own dependency-free stack — a **Custom Session-Locked DataStore Wrapper** (`ProfileStore`) for safe DataStore session locking, auto-save, and `BindToClose` durability, plus **Standard Roblox RemoteEvents** (`WalletSyncEvent`) for robust one-way (Server-to-Client) state synchronization.
 * **Read-Only Client Separation:** Strict boundaries where the client side is designed to be purely read-only, existing solely to observe state changes and update the GUI.
 * **Rojo Integration:** Fully configured with a `default.project.json` to automatically route modules to their correct Roblox DataModel locations (`ServerScriptService`, `StarterPlayerScripts`, and `ReplicatedStorage`).
-* **AI-Assisted Workflow:** Pre-configured with `AGENTS.md`, `SKILLS.md`, and `CLAUDE.md` to enforce strict coding standards, Git workflows, and architectural rules for AI agents like Claude Code.
 
 ## 📁 Project Structure
 
@@ -20,13 +19,6 @@ The repository is organized to support a modular and secure workflow:
 * **`src/client/`** — Contains frontend logic exclusively for reading synced data (received over the `WalletSyncEvent` RemoteEvent) and triggering UI updates.
 * **`src/shared/`** — Contains shared resources acting as a bridge between the server and client, such as Constants, Types, Configs, and RemoteEvent definitions.
 * **`aftman.toml`** — Manages cross-platform toolchains to ensure consistent versions of tools like Rojo (`rojo-rbx/rojo@7.7.0-rc.1`) across the entire team and CI/CD pipelines.
-
-## 🤖 AI Agent Instructions
-
-If you are an AI assistant (e.g., Claude Code), you MUST adhere to the following rules:
-1. You must read [AGENTS.md](AGENTS.md) and [SKILLS.md](SKILLS.md) before executing any task.
-2. Ensure all data mutations happen on the server and persist through the custom session-locked **`ProfileStore`** wrapper, and sync state to the client exclusively via **Standard Roblox RemoteEvents** (`WalletSyncEvent`). Treat the client state as strictly read-only.
-3. All commits must strictly follow the Conventional Commits specification outlined in `AGENTS.md`.
 
 ## 💰 Currency System
 
