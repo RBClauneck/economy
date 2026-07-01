@@ -9,35 +9,15 @@ below.
 | Path | Purpose |
 |---|---|
 | README.md | Overview, key features, currency system, and installation guide. |
-| default.project.json | Rojo project file mapping `src/` into the Roblox DataModel. |
+| default.project.json | Rojo project file mapping `src/EconomyProvider.luau` into `ReplicatedStorage`. |
 | aftman.toml | Pinned toolchain versions (Rojo) for local and CI builds. |
 | .gitignore | Files and directories excluded from version control. |
 
-## src/server/ — Server-Authoritative Economy Core
+## src/ — The Library
 
 | Path | Purpose |
 |---|---|
-| src/server/init.server.luau | Bootstrap: wires player lifecycle into persistence and replication. |
-| src/server/CurrencyService.luau | Core server API: `addMoney`, `minusMoney`, `getBalance`, `getWallet`, `canAfford`. |
-| src/server/ProfileStore.luau | In-house session-locked DataStore wrapper. |
-| src/server/Replication.luau | Server to client wallet sync over `WalletSyncEvent`. |
-| src/server/Validation.luau | Argument and result validation for economy mutations. |
-
-## src/client/ — Read-Only Client
-
-| Path | Purpose |
-|---|---|
-| src/client/init.client.luau | Bootstrap: feeds the controller from `WalletSyncEvent`. |
-| src/client/WalletController.luau | Read-only wallet mirror with `getBalance` / `onChanged`. |
-| src/client/WalletGui.luau | Built-in currency panel UI. |
-
-## src/shared/ — Server/Client Contract
-
-| Path | Purpose |
-|---|---|
-| src/shared/Types.luau | Shared type definitions (`Wallet`, `MutationResult`, etc.). |
-| src/shared/Constants.luau | Centralised constants (DataStore name, RemoteEvent name, timings). |
-| src/shared/CurrencyConfig.luau | Currency registry: base currencies plus `register` for custom ones. |
+| src/EconomyProvider.luau | The entire economy package in one drop-in ModuleScript: currency registry, validation, session-locked persistence, replication, the server mutation API, the client wallet mirror, and the built-in wallet UI. Detects server vs. client automatically. |
 
 ## wiki/ — Reference Documentation
 
