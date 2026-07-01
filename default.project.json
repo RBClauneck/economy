@@ -4,8 +4,22 @@
     "$className": "DataModel",
 
     "ReplicatedStorage": {
-      "EconomyProvider": {
-        "$path": "src/EconomyProvider.luau"
+      "EconomyShared": {
+        "$path": "src/shared"
+      }
+    },
+
+    "ServerScriptService": {
+      "Server": {
+        "$path": "src/server"
+      }
+    },
+
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Client": {
+          "$path": "src/client"
+        }
       }
     },
 
