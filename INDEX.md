@@ -9,6 +9,8 @@ below.
 | Path | Purpose |
 |---|---|
 | README.md | Overview, key features, currency system, and installation guide. |
+| AGENTS.md | Primary AI-agent instruction set: strict rules, Git conventions, and economy-specific coding standards. |
+| INDEX.md | This file: the repository map. |
 | default.project.json | Rojo project file mapping `src/{shared,server,client}` into the Roblox DataModel. |
 | aftman.toml | Pinned toolchain versions (Rojo) for local and CI builds. |
 | .gitignore | Files and directories excluded from version control. |
